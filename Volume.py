@@ -1,7 +1,8 @@
+
 import requests
 
 # ONTAP cluster details
-CLUSTER = "https://	192.168.0.101"
+CLUSTER = "https://192.168.0.101"   # no tab or spaces
 USER = "admin"
 PASS = "Netapp1!"
 
@@ -13,10 +14,12 @@ payload = {
     "size": 1073741824  # 1 GiB in bytes
 }
 
-# Send POST request
 url = f"{CLUSTER}/api/storage/volumes"
-response = requests.post(url, json=payload, auth=(USER, PASS), verify=False)
 
-print("Status:", response.status_code)
-print("Response:", response.json())
-
+# add timeout and better error handling
+try:
+    r = requests.post(url, json=payload, auth=(USER, PASS), verify=False, timeout=15)
+    print("Status:", r.status_code)
+    print("Response:", r.json() if r.headers.get("Content-Type","").startswith("application/json") else r.text)
+except requests.RequestException as e:
+    print("Connection error:", e)
